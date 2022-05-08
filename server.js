@@ -47,6 +47,12 @@ io.on('connection', socket => {
     io.to(user.room).emit('message', formatMessage(user.username, msg));
   });
 
+  socket.on('fileMessage', fileMessage => {
+    const user = getCurrentUser(socket.id);
+    const message = formatMessage(user.username, "")
+    io.to(user.room).emit('fileMessage', {...fileMessage, ...message});
+  });
+
   // Avisando que o Usuário saiu do chat e atualizando as informações da sala
   socket.on('disconnect', () => {
     const user = userLeave(socket.id);

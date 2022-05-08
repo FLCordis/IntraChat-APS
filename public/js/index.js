@@ -7,9 +7,6 @@ $(document).ready(function (){
             var inputData = reader.result;
             var replaceValue = (inputData.split(',')[0]);
             var base64string = inputData.replace(replaceValue + ",","");
-
-            console.log(base64string);
-            $('#Attachment').val(base64string);
         }
     });
 
