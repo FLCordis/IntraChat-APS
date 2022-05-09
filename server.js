@@ -17,7 +17,7 @@ const io = socketio(server);
 // Pasta Estática de Uso
 app.use(express.static(path.join(__dirname, 'public')));
 
-const botName = 'Douglinhas Bot';
+const botName = 'Douglas Bot';
 
 // Quando um cliente conecta
 io.on('connection', socket => {
