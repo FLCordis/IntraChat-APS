@@ -3,6 +3,7 @@ const chatMessages = document.querySelector('.chat-messages');
 const roomName = document.getElementById('room-name');
 const uploadButton = document.getElementById('idSelectionFile');
 const userList = document.getElementById('users');
+const ONE_MEGABYTE = 1048576;
 
 // Pegar o Usuário e a Sala pela URL
 const {username, room} = Qs.parse(location.search,{
@@ -23,13 +24,21 @@ socket.on('roomUsers', ({room, users}) => {
 //Upload do arquivo
 uploadButton.addEventListener('change', function (e){
     var file = e.target.files[0];
+    if (file.size > ONE_MEGABYTE) {
+        alert('Somente arquivos até um 1 Megabyte são permitidos.');
+    } else {
+        sendFile(file);
+    }
+});
+
+//Envia arquivo para o servidor
+function sendFile(file) {
     var reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = function () {
         var inputData = reader.result;
         var replaceValue = (inputData.split(',')[0]);
         var base64string = inputData.replace(replaceValue + ",","");
-
         const fileMessage = {
             name: file.name,
             type: file.type,
@@ -37,7 +46,7 @@ uploadButton.addEventListener('change', function (e){
         }
         socket.emit('fileMessage', fileMessage);
     }
-});
+}
 
 //Mensagem do servidor
 socket.on('message', message => {
@@ -87,8 +96,8 @@ function outputFileMessage(message){
     div.classList.add('message');
     div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
     <p class="text">
-        Arquivo: ${message.name} - 
-        <a href="${linkSource}" download="${message.name}">
+        Enviou um arquivo: ${message.name} - 
+        <a href="${linkSource}" style="color: #08ad39; font-weight:bold" download="${message.name}">
             Download
         </a>
     </p>`;
