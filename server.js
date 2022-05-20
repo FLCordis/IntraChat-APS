@@ -30,8 +30,7 @@ io.on('connection', socket => {
     socket.emit('message', formatMessage(botName, 'Seja bem vindo ao chat!'));
 
     // Transmissão pra sala quando um usuário chega
-    socket.broadcast.to(user.room).emit('message',formatMessage(botName, `${user.username} entrou no chat!`)
-      );
+    socket.broadcast.to(user.room).emit('message',formatMessage(botName, `${user.username} entrou no chat!`));
 
     // Info sobre a sala (Nome e Usuários)
     io.to(user.room).emit('roomUsers', {
@@ -47,6 +46,7 @@ io.on('connection', socket => {
     io.to(user.room).emit('message', formatMessage(user.username, msg));
   });
 
+  // Listener do envio de arquivos, avisando sobre 
   socket.on('fileMessage', fileMessage => {
     const user = getCurrentUser(socket.id);
     const message = formatMessage(user.username, "")

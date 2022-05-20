@@ -20,6 +20,7 @@ socket.on('roomUsers', ({room, users}) => {
      outputUsers(users);
 });
 
+//Upload do arquivo
 uploadButton.addEventListener('change', function (e){
     var file = e.target.files[0];
     var reader = new FileReader();
@@ -81,7 +82,7 @@ function outputMessage(message){
 
 // Output mensagem de arquivo para DOM
 function outputFileMessage(message){
-    const linkSource = `data:application/pdf;base64,${message.encoded}`;
+    const linkSource = `data:${message.type};base64,${message.encoded}`;
     const div = document.createElement('div');
     div.classList.add('message');
     div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
