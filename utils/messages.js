@@ -1,10 +1,11 @@
-var moment = require('moment-timezone');
+const moment = require('moment-timezone');
+const DEFAULT_TIMEZONE = process.env.DEFAULT_TIMEZONE || 'America/Sao_Paulo';
 
-function formatMessage(username, text) {
+const formatMessage = (username, text) => {
     return {
         username,
         text,
-        time: moment().tz('America/Sao_Paulo').format('hh:mm a')
+        time: moment().tz(DEFAULT_TIMEZONE).format('hh:mm a')
     }
 }
 

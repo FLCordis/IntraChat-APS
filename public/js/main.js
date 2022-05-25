@@ -21,34 +21,7 @@ socket.on('roomUsers', ({room, users}) => {
      outputUsers(users);
 });
 
-//Upload do arquivo
-uploadButton.addEventListener('change', function (e){
-    var file = e.target.files[0];
-    if (file.size > ONE_MEGABYTE) {
-        alert('Somente arquivos até um 1 Megabyte são permitidos.');
-    } else {
-        sendFile(file);
-    }
-});
-
-//Envia arquivo para o servidor
-function sendFile(file) {
-    var reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = function () {
-        var inputData = reader.result;
-        var replaceValue = (inputData.split(',')[0]);
-        var base64string = inputData.replace(replaceValue + ",","");
-        const fileMessage = {
-            name: file.name,
-            type: file.type,
-            encoded: base64string
-        }
-        socket.emit('fileMessage', fileMessage);
-    }
-}
-
-//Mensagem do servidor
+//Mensagem chegando do servidor
 socket.on('message', message => {
     outputMessage(message);
 
@@ -56,6 +29,7 @@ socket.on('message', message => {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 });
 
+//Arquivo chegando do servidor
 socket.on('fileMessage', message => {
     outputFileMessage(message)
 
@@ -63,7 +37,7 @@ socket.on('fileMessage', message => {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 });
 
-//Envio da Mensagem
+//Envio da Mensagem para o Servidor
 chatForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -78,8 +52,46 @@ chatForm.addEventListener('submit', (e) => {
     e.target.elements.msg.focus();
 });
 
+//Listener olhando mudança no input de upload de arquivo
+uploadButton.addEventListener('change', (e) => {
+    e.preventDefault();
+
+    //pegando o arquivo enviado
+    var file = e.target.files[0];
+
+    //valida se o arquivo excede o tamanho máximo permitido
+    if (file.size > ONE_MEGABYTE) {
+        //alerta o usuário sobre o tamanho máximo permito para envio de arquivos
+        alert('Somente arquivos até um 1 Megabyte são permitidos.');
+    } else {
+        //método que prepara o arquivo para envio ao servidor
+        sendFile(file);
+    }
+});
+
+//Envio do arquivo para o servidor
+const sendFile = (file) => {
+    //Cria um leitor para o arquivo já validado
+    var reader = new FileReader();
+
+    //método para ler o arquivo
+    reader.readAsDataURL(file);
+
+    //evento que é disparado quando a leitura do arquivo é concluída
+    reader.onload = () => {
+        //pega o resultado da leitura do arquivo que é convertido para base64
+        const base64string = (reader.result.split(',')[1]);
+        const fileMessage = {
+            name: file.name,
+            type: file.type,
+            encoded: base64string
+        }
+        socket.emit('fileMessage', fileMessage);
+    }
+}
+
 // Output mensagem para DOM
-function outputMessage(message){
+const outputMessage = (message) => {
     const div = document.createElement('div');
     div.classList.add('message');
     div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
@@ -90,13 +102,13 @@ function outputMessage(message){
 }
 
 // Output mensagem de arquivo para DOM
-function outputFileMessage(message){
+const outputFileMessage = (message) => {
     const linkSource = `data:${message.type};base64,${message.encoded}`;
     const div = document.createElement('div');
     div.classList.add('message');
-    div.innerHTML = `<p class="meta">${message.username} <span>${message.time}</span></p>
+    div.innerHTML = `<p class="meta">${message.username} <span style="font-weight: normal;">enviou um arquivo</span> <span>${message.time}</span></p>
     <p class="text">
-        Enviou um arquivo: ${message.name} - 
+        <span style="font-style:italic">${message.name}</span> - 
         <a href="${linkSource}" style="color: #08ad39; font-weight:bold" download="${message.name}">
             Download
         </a>
@@ -105,12 +117,12 @@ function outputFileMessage(message){
 }
 
 //Adicionando o nome da sala no DOM
-function outputRoomName(room){
+const outputRoomName = (room) => {
     roomName.innerText = room;
 }
 
 //Adicionando os Usuarios
-function outputUsers(users){
+const outputUsers = (users) => {
     userList.innerHTML = `
     ${users.map(user => `<li>${user.username}</li>`).join('')}
     `;
